@@ -1,0 +1,4 @@
+Slackfish
+-----------
+
+Slack client on Jolla Sailfish OS
