@@ -36,7 +36,7 @@ Page {
     property string apiTest: "Placeholder"
 
     Component.onCompleted: {
-        slackWorker.sendMessage({ 'type': 'apiTest' });
+        slackWorker.sendMessage('api.test');
     }
 
     WorkerScript {
