@@ -24,7 +24,8 @@ OTHER_FILES += qml/harbour-slackfish.qml \
     rpm/harbour-slackfish.spec \
     rpm/harbour-slackfish.yaml \
     translations/*.ts \
-    harbour-slackfish.desktop
+    harbour-slackfish.desktop \
+    qml/js/slack.js
 
 # to disable building translations every time, comment out the
 # following CONFIG line

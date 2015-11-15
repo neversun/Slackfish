@@ -31,9 +31,21 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-
 Page {
     id: page
+    property string apiTest: "Placeholder"
+
+    Component.onCompleted: {
+        slackWorker.sendMessage({ 'type': 'apiTest' });
+    }
+
+    WorkerScript {
+        id: slackWorker
+        source: "../js/slack.js"
+        onMessage: {
+            page.apiTest = messageObject.data
+        }
+    }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
@@ -63,6 +75,12 @@ Page {
             Label {
                 x: Theme.paddingLarge
                 text: qsTr("Hello Sailors")
+                color: Theme.secondaryHighlightColor
+                font.pixelSize: Theme.fontSizeExtraLarge
+            }
+            Label {
+                x: Theme.paddingLarge
+                text: page.apiTest
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeExtraLarge
             }
