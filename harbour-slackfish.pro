@@ -24,8 +24,7 @@ OTHER_FILES += qml/harbour-slackfish.qml \
     rpm/harbour-slackfish.spec \
     rpm/harbour-slackfish.yaml \
     translations/*.ts \
-    harbour-slackfish.desktop \
-    qml/js/slack.js
+    harbour-slackfish.desktop
 
 # to disable building translations every time, comment out the
 # following CONFIG line
@@ -36,4 +35,7 @@ CONFIG += sailfishapp_i18n
 # following TRANSLATIONS line. And also do not forget to
 # modify the localized app name in the the .desktop file.
 TRANSLATIONS += translations/harbour-slackfish-de.ts
+
+DISTFILES += \
+    qml/js/slackWorker.js
 
