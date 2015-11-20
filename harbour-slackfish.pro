@@ -37,5 +37,8 @@ CONFIG += sailfishapp_i18n
 TRANSLATIONS += translations/harbour-slackfish-de.ts
 
 DISTFILES += \
+    qml/pages/AuthPage.qml \
+    qml/images/slack_rgb.png \
+    qml/js/applicationShared.js \
     qml/js/slackWorker.js
 
