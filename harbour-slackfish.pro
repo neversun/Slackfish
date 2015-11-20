@@ -40,5 +40,5 @@ DISTFILES += \
     qml/pages/AuthPage.qml \
     qml/images/slack_rgb.png \
     qml/js/applicationShared.js \
-    qml/js/slackWorker.js
+    qml/js/services/slackWorker.js
 

@@ -13,7 +13,7 @@ Page {
 
     WorkerScript {
         id: slackWorker
-        source: "../js/slackWorker.js"
+        source: "../js/services/slackWorker.js"
         onMessage: {
             if(messageObject.apiMethod === 'oauth.access') {
                 tokenReceived(messageObject.data);
