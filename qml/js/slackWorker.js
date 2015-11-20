@@ -53,3 +53,23 @@ function httpGet(endpoint, apiMethod) {
     http.open("GET", endpoint);
     http.send();
 }
+
+function httpPost(endpoint, apiMethod, data) {
+    var http = new XMLHttpRequest();
+
+    http.onreadystatechange = function() {
+     if (http.readyState === XMLHttpRequest.DONE) {
+        console.log(http.status, http.statusText);
+
+        if(http.status === 200) {
+            WorkerScript.sendMessage({ 'status': 'done', 'data': JSON.parse(http.responseText), 'apiMethod': apiMethod });
+        } else {
+            WorkerScript.sendMessage({ 'status': 'error', 'data': null, 'apiMethod': apiMethod });
+        }
+     }
+    }
+
+    http.open("POST", endpoint);
+    http.setRequestHeader('Content-Type', 'application/json');
+    http.send(JSON.stringify(data));
+}
