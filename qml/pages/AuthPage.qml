@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import "../js/applicationShared.js" as Globals
+import "../js/logic/authPageLogic.js" as Logic
 
 Page {
     id: authPage
@@ -9,17 +9,12 @@ Page {
     property string redirect_uri : "http://0.0.0.0:12345/oauth"
     property string auth_url : "https://slack.com/oauth/authorize?client_id=" + client_id + "&scope=" + scope + "&redirect_uri=" + redirect_uri
     property bool showWebview : false
-    property string slack_api_code: ""
 
     WorkerScript {
         id: slackWorker
         source: "../js/services/slackWorker.js"
         onMessage: {
-            if(messageObject.apiMethod === 'oauth.access') {
-                tokenReceived(messageObject.data);
-            } else {
-                anyMessageReceived(messageObject);
-            }
+            Logic.workerOnMessage(messageObject);
         }
     }
 
@@ -62,34 +57,9 @@ Page {
     SilicaWebView {
         id: webview
         visible: showWebview
-
         anchors.fill: parent
-
         onUrlChanged: {
-            if(url.toString().indexOf(redirect_uri)==0) {
-                //Success
-                console.log(url);
-                var extracted = url.toString().substring(redirect_uri.length + 6).replace("&state=","");
-                authPage.slack_api_code = extracted;
-                authentificated();
-            } else {
-                console.log(url);
-            }
+            Logic.webViewUrlChanged(url);
         }
-
-    }
-
-    function authentificated() {
-        console.log(authPage.slack_api_code);
-        slackWorker.sendMessage({'apiMethod': "oauth.access", 'code': authPage.slack_api_code});
-    }
-
-    function tokenReceived(data) {
-        Globals.slackToken = data.access_token;
-        slackWorker.sendMessage({'apiMethod': "channels.list", 'token': Globals.slackToken});
-    }
-
-    function anyMessageReceived(data) {
-        console.log(JSON.stringify(data));
     }
 }
