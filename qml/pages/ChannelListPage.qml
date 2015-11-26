@@ -47,6 +47,7 @@ Page {
                 model: channelModel
 
                 delegate: BackgroundItem {
+                    onClicked: { pageStack.push(Qt.resolvedUrl("ChannelPage.qml"), { name: model.name }) }
                     width: parent.width
                     Label {
                         text: '#' + model.name
