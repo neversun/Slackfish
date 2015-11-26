@@ -18,8 +18,6 @@ SOURCES += src/harbour-slackfish.cpp
 
 OTHER_FILES += qml/harbour-slackfish.qml \
     qml/cover/CoverPage.qml \
-    qml/pages/FirstPage.qml \
-    qml/pages/SecondPage.qml \
     rpm/harbour-slackfish.changes.in \
     rpm/harbour-slackfish.spec \
     rpm/harbour-slackfish.yaml \
