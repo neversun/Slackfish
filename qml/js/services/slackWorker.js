@@ -10,7 +10,7 @@ WorkerScript.onMessage = function(data) {
     if (data.apiMethod === 'oauth.access') {
         oauthAccessRequest(data.apiMethod, data.code);
     } else if(data.apiMethod) {
-        genericApiRequest(data.apiMethod, data.token);
+        genericApiRequest(data.apiMethod, data.token, data.arguments);
     }
     else {
         console.log("Unknown request to workerScript");
@@ -18,8 +18,15 @@ WorkerScript.onMessage = function(data) {
 }
 
 /* Slack API function wrappers */
-function genericApiRequest(apiMethod, token) {
+function genericApiRequest(apiMethod, token, arguments) {
     var endpoint = baseUrl + apiMethod + '?token=' + token;
+
+    if (arguments) {
+        for(var key in arguments) {
+            endpoint = endpoint + '&' + key + '=' + arguments[key];
+        }
+    }
+
     console.log('genericApiRequest:', endpoint);
     httpGet(endpoint, apiMethod);
 }
