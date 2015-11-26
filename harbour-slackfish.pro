@@ -41,5 +41,7 @@ DISTFILES += \
     qml/js/services/slackWorker.js \
     qml/js/logic/authPageLogic.js \
     qml/pages/ChannelListPage.qml \
-    qml/js/logic/channelListPageLogic.js
+    qml/js/logic/channelListPageLogic.js \
+    qml/pages/ChannelPage.qml \
+    qml/js/logic/channelPageLogic.js
 
