@@ -5,31 +5,30 @@ import "../js/logic/channelListPageLogic.js" as Logic
 Page {
     id: channelListPage
 
+    ListModel {
+        id: channelModel
+    }
+
+
+    WorkerScript {
+        id: slackWorker
+        source: "../js/services/slackWorker.js"
+        onMessage: {
+            Logic.workerOnMessage(messageObject);
+        }
+    }
+
+
+    Component.onCompleted: {
+        Logic.loadChannels();
+    }
+
+    // -------------------------
+
+
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: column.height
-
-
-        ListModel {
-            id: channelModel
-        }
-
-
-        WorkerScript {
-            id: slackWorker
-            source: "../js/services/slackWorker.js"
-            onMessage: {
-                Logic.workerOnMessage(messageObject);
-            }
-        }
-
-
-        Component.onCompleted: {
-            Logic.loadChannels();
-        }
-
-        // -------------------------
-
 
         Column {
             id: column
