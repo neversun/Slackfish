@@ -6,7 +6,7 @@ Page {
     id: channelListPage
 
     ListModel {
-        id: channelModel
+        id: channelListModel
     }
 
 
@@ -43,7 +43,7 @@ Page {
                 id: channelList
                 width: parent.width
                 height: parent.height
-                model: channelModel
+                model: channelListModel
 
                 delegate: BackgroundItem {
                     onClicked: { pageStack.push(Qt.resolvedUrl("ChannelPage.qml"), { name: model.name }) }
