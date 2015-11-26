@@ -1,9 +1,9 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import "../js/logic/channelPageLogic.js" as Logic
+import "../js/logic/channelListPageLogic.js" as Logic
 
 Page {
-    id: channelPage
+    id: channelListPage
 
     SilicaFlickable {
         anchors.fill: parent
@@ -34,7 +34,7 @@ Page {
         Column {
             id: column
 
-            width: channelPage.width
+            width: channelListPage.width
             spacing: Theme.paddingLarge
             PageHeader {
                 title: qsTr("Channels")

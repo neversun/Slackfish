@@ -17,6 +17,6 @@ function loadChannels() {
 
 function addChannelsToModel(data) {
     for(var i=0; i<data.channels.length; i++) {
-        channelModel.append(data.channels[i]);
+        channelList.append(data.channels[i]);
     }
 }
