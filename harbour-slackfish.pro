@@ -41,5 +41,7 @@ DISTFILES += \
     qml/images/slack_rgb.png \
     qml/js/applicationShared.js \
     qml/js/services/slackWorker.js \
-    qml/js/logic/authPageLogic.js
+    qml/js/logic/authPageLogic.js \
+    qml/pages/ChannelPage.qml \
+    qml/js/logic/channelPageLogic.js
 

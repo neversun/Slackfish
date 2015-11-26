@@ -33,5 +33,5 @@ function authentificated(code) {
 function tokenReceived(data) {
     Globals.slackToken = data.access_token;
 
-    slackWorker.sendMessage({'apiMethod': "channels.list", 'token': Globals.slackToken});
+      pageStack.replace(Qt.resolvedUrl("../../pages/ChannelPage.qml"))
 }
