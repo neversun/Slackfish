@@ -35,6 +35,7 @@ Page {
 
             width: channelListPage.width
             spacing: Theme.paddingLarge
+
             PageHeader {
                 title: qsTr("Channels")
             }
