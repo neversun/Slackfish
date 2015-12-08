@@ -19,15 +19,24 @@ function loadChannelInfo() {
 
 
 function loadChannelHistory() {
-    slackWorker.sendMessage({'apiMethod': "channels.history", 'token': Globals.slackToken});
+    var arguments = {
+        channel: channelPage.channelID,
+        count: 20
+    }
+
+    slackWorker.sendMessage({'apiMethod': "channels.history", 'token': Globals.slackToken, 'arguments': arguments});
 }
 
 
 // private
 
 function addMessagesToModel(data) {
-    for(var i=0; i<data.messages.length; i++) {
-        channelList.append(data.messages[i]);
+    if(data.ok === false) {
+        console.log("addMessagesToModel:", data.error)
+    } else {
+        for(var i=data.messages.length-1; i >= 0; i--) {
+            messagesModel.append(data.messages[i]);
+        }
     }
 }
 
