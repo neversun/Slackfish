@@ -12,8 +12,7 @@ function workerOnMessage(messageObject) {
 
 function loadChannelInfo() {
     var arguments = {
-        channel: channelPage.channelID,
-        count: 42
+        channel: channelPage.channelID
     }
     slackWorker.sendMessage({'apiMethod': "channels.info", 'token': Globals.slackToken, 'arguments': arguments });
 }
