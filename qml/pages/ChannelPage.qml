@@ -26,6 +26,7 @@ Page {
 
     Component.onCompleted: {
         Logic.loadChannelInfo();
+        Logic.loadChannelHistory();
     }
 
     // -------------------------
@@ -51,6 +52,7 @@ Page {
 
             Column {
                 width: parent.width
+                spacing: Theme.paddingLarge
 
                 Label {
                     wrapMode: TextEdit.WordWrap
@@ -58,25 +60,26 @@ Page {
                     width: parent.width
                     font.pixelSize: Theme.fontSizeSmall
                     text: channelPage.channelPurpose
+                    color: Theme.secondaryColor
                 }
 
-                SilicaListView {
+                ColumnView {
                     id: channelList
                     width: parent.width
                     height: parent.heighth
-                    //                model: channelModel
+                    model: messagesModel
+                    itemHeight: Theme.itemSizeSmall
 
-                    //                delegate: BackgroundItem {
-                    //                    width: parent.width
-                    //                    Label {
-                    //                        text: '#' + model.name
-                    //                        font.pixelSize: Theme.fontSizeLarge
-                    //                        height: Theme.itemSizeLarge
-                    //                        width: parent.width
-                    //                        color: highlighted ? Theme.highlightColor : Theme.primaryColor
-                    //                        horizontalAlignment: Text.AlignHCenter
-                    //                    }
-                    //                }
+                    delegate: BackgroundItem {
+                        width: parent.width
+                        Label {
+                            width: parent.width
+                            text: model.text
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.primaryColor
+                            wrapMode: TextEdit.WordWrap
+                        }
+                    }
                 }
             }
         }
