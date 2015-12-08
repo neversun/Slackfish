@@ -68,10 +68,15 @@ Page {
                     width: parent.width
                     height: parent.heighth
                     model: messagesModel
-                    itemHeight: Theme.itemSizeSmall
+                    itemHeight: Theme.itemSizeLarge
 
                     delegate: BackgroundItem {
                         width: parent.width
+
+                        SectionHeader {
+                            text: model.user + ' ' + new Date(model.ts * 1000).toLocaleTimeString()
+                        }
+
                         Label {
                             width: parent.width
                             text: model.text
