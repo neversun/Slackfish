@@ -39,32 +39,45 @@ Page {
             id: column
             width: channelPage.width
             spacing: Theme.paddingLarge
+            anchors {
+               left: parent.left
+               right: parent.right
+               margins: Theme.paddingLarge
+            }
 
             PageHeader {
                 title: '#' + channelPage.channelName
             }
 
-            SectionHeader {
-                text: channelPage.channelPurpose
-            }
-
-            SilicaListView {
-                id: channelList
+            Column {
                 width: parent.width
-                height: parent.height
-                //                model: channelModel
 
-                //                delegate: BackgroundItem {
-                //                    width: parent.width
-                //                    Label {
-                //                        text: '#' + model.name
-                //                        font.pixelSize: Theme.fontSizeLarge
-                //                        height: Theme.itemSizeLarge
-                //                        width: parent.width
-                //                        color: highlighted ? Theme.highlightColor : Theme.primaryColor
-                //                        horizontalAlignment: Text.AlignHCenter
-                //                    }
-                //                }
+                Label {
+                    wrapMode: TextEdit.WordWrap
+                    textFormat: Text.RichText
+                    width: parent.width
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: channelPage.channelPurpose
+                }
+
+                SilicaListView {
+                    id: channelList
+                    width: parent.width
+                    height: parent.heighth
+                    //                model: channelModel
+
+                    //                delegate: BackgroundItem {
+                    //                    width: parent.width
+                    //                    Label {
+                    //                        text: '#' + model.name
+                    //                        font.pixelSize: Theme.fontSizeLarge
+                    //                        height: Theme.itemSizeLarge
+                    //                        width: parent.width
+                    //                        color: highlighted ? Theme.highlightColor : Theme.primaryColor
+                    //                        horizontalAlignment: Text.AlignHCenter
+                    //                    }
+                    //                }
+                }
             }
         }
     }
