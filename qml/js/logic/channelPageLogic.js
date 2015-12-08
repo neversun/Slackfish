@@ -27,6 +27,11 @@ function loadChannelHistory() {
     slackWorker.sendMessage({'apiMethod': "channels.history", 'token': Globals.slackToken, 'arguments': arguments});
 }
 
+function sendMessage(text) {
+    // TODO
+    console.log("sendMessage", text);
+}
+
 
 // private
 

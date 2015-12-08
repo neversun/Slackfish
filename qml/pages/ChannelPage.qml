@@ -43,7 +43,7 @@ Page {
             anchors {
                left: parent.left
                right: parent.right
-               margins: Theme.paddingLarge
+               margins: Theme.horizontalPageMargin
             }
 
             PageHeader {
@@ -66,7 +66,6 @@ Page {
                 ColumnView {
                     id: channelList
                     width: parent.width
-                    height: parent.heighth
                     model: messagesModel
                     itemHeight: Theme.itemSizeLarge
 
@@ -85,6 +84,18 @@ Page {
                             wrapMode: TextEdit.WordWrap
                         }
                     }
+                }
+            }
+
+            TextArea {
+                width: parent.width
+                placeholderText: qsTr("Enter message here")
+
+                EnterKey.enabled: text.length > 0
+                EnterKey.iconSource: "image://theme/icon-m-enter-accept"
+                EnterKey.onClicked: {
+                    Logic.sendMessage(text)
+                    text = ""
                 }
             }
         }
