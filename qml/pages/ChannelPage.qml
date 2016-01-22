@@ -50,53 +50,50 @@ Page {
                 title: '#' + channelPage.channelName
             }
 
-            Column {
+            Label {
+                wrapMode: TextEdit.WordWrap
+                textFormat: Text.RichText
                 width: parent.width
-                spacing: Theme.paddingLarge
-
-                Label {
-                    wrapMode: TextEdit.WordWrap
-                    textFormat: Text.RichText
-                    width: parent.width
-                    font.pixelSize: Theme.fontSizeSmall
-                    text: channelPage.channelPurpose
-                    color: Theme.secondaryColor
-                }
-
-                ColumnView {
-                    id: channelList
-                    width: parent.width
-                    model: messagesModel
-                    itemHeight: Theme.itemSizeLarge
-
-                    delegate: BackgroundItem {
-                        width: parent.width
-
-                        SectionHeader {
-                            text: model.user + ' ' + new Date(model.ts * 1000).toLocaleTimeString()
-                        }
-
-                        Label {
-                            width: parent.width
-                            text: model.text
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.primaryColor
-                            wrapMode: TextEdit.WordWrap
-                        }
-                    }
-                }
+                font.pixelSize: Theme.fontSizeSmall
+                text: channelPage.channelPurpose
+                color: Theme.secondaryColor
             }
 
-            TextArea {
+            SilicaListView {
+                id: channelList
+                height: Theme.itemSizeLarge * messagesModel.count
                 width: parent.width
-                placeholderText: qsTr("Enter message here")
+                model: messagesModel
 
-                EnterKey.enabled: text.length > 0
-                EnterKey.iconSource: "image://theme/icon-m-enter-accept"
-                EnterKey.onClicked: {
-                    Logic.sendMessage(text)
-                    text = ""
+                delegate: BackgroundItem {
+                    width: ListView.view.width
+                    height: Theme.itemSizeLarge
+
+                    SectionHeader {
+                        text: model.user + ' ' + new Date(model.ts * 1000).toLocaleTimeString()
+                    }
+
+                    Label {
+                        text: model.text
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.primaryColor
+                        wrapMode: TextEdit.WordWrap
+                    }
                 }
+
+                footer:
+                    TextArea {
+                        id: textAreaMessage
+                        width: parent.width
+                        placeholderText: qsTr("Enter message here")
+
+                        EnterKey.enabled: text.length > 0
+                        EnterKey.iconSource: "image://theme/icon-m-enter-accept"
+                        EnterKey.onClicked: {
+                            Logic.sendMessage(text)
+                            text = ""
+                        }
+                    }
             }
         }
     }
