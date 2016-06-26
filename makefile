@@ -1,6 +1,6 @@
 SSH_SAILFISH = ssh -p 2222 -i /home/never/SailfishOS/vmshare/ssh/private_keys/engine/mersdk mersdk@localhost $(1)
 
-build: sailfish_build deploy
+build: sync sailfish_build deploy
 
 deploy: sailfish_deploy
 
