@@ -3,98 +3,89 @@ import Sailfish.Silica 1.0
 import "../js/logic/channelPageLogic.js" as Logic
 
 Page {
-    id: channelPage
+  id: channelPage
 
-    // properties from lower stack page
-    property variant    channelName
-    property variant    channelID
+  // properties from lower stack page
+  property variant    channelName
+  property variant    channelID
 
-    property string channelPurpose
+  property string channelPurpose
 
-    ListModel {
-        id: messagesModel
+  ListModel {
+    id: messagesModel
+  }
+
+  WorkerScript {
+    id: slackWorker
+    source: "../js/services/slackWorker.js"
+    onMessage: {
+      Logic.workerOnMessage(messageObject);
+    }
+  }
+
+
+  Component.onCompleted: {
+    Logic.loadChannelInfo();
+    Logic.loadChannelHistory();
+  }
+
+  SilicaListView {
+    anchors.fill: parent
+    anchors.margins: Theme.horizontalPageMargin
+    id: channelList
+    model: messagesModel
+
+    header: Column {
+      width: parent.width
+
+      PageHeader {
+        title: '#' + channelPage.channelName
+      }
+
+      Label {
+        width: parent.width
+        wrapMode: TextEdit.WordWrap
+        textFormat: Text.RichText
+        font.pixelSize: Theme.fontSizeSmall
+        text: channelPage.channelPurpose
+        color: Theme.secondaryColor
+      }
     }
 
-    WorkerScript {
-        id: slackWorker
-        source: "../js/services/slackWorker.js"
-        onMessage: {
-            Logic.workerOnMessage(messageObject);
+    delegate: ListItem {
+      contentHeight: column.height
+
+      Column {
+        id: column
+        width: parent.width
+
+        Label {
+          width: parent.width
+          wrapMode: TextEdit.WordWrap
+          text: model.text
+          textFormat: Text.RichText
+          font.pixelSize: Theme.fontSizeSmall
+          color: Theme.primaryColor
         }
-    }
 
-
-    Component.onCompleted: {
-        Logic.loadChannelInfo();
-        Logic.loadChannelHistory();
-    }
-
-    // -------------------------
-
-
-    SilicaFlickable {
-        anchors.fill: parent
-        contentHeight: column.height
-
-        Column {
-            id: column
-            width: channelPage.width
-            spacing: Theme.paddingLarge
-            anchors {
-               left: parent.left
-               right: parent.right
-               margins: Theme.horizontalPageMargin
-            }
-
-            PageHeader {
-                title: '#' + channelPage.channelName
-            }
-
-            Label {
-                wrapMode: TextEdit.WordWrap
-                textFormat: Text.RichText
-                width: parent.width
-                font.pixelSize: Theme.fontSizeSmall
-                text: channelPage.channelPurpose
-                color: Theme.secondaryColor
-            }
-
-            SilicaListView {
-                id: channelList
-                height: Theme.itemSizeLarge * messagesModel.count
-                width: parent.width
-                model: messagesModel
-
-                delegate: BackgroundItem {
-                    width: ListView.view.width
-                    height: Theme.itemSizeLarge
-
-                    SectionHeader {
-                        text: model.user + ' ' + new Date(model.ts * 1000).toLocaleTimeString()
-                    }
-
-                    Label {
-                        text: model.text
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.primaryColor
-                        wrapMode: TextEdit.WordWrap
-                    }
-                }
-
-                footer:
-                    TextArea {
-                        id: textAreaMessage
-                        width: parent.width
-                        placeholderText: qsTr("Enter message here")
-
-                        EnterKey.enabled: text.length > 0
-                        EnterKey.iconSource: "image://theme/icon-m-enter-accept"
-                        EnterKey.onClicked: {
-                            Logic.sendMessage(text)
-                            text = ""
-                        }
-                    }
-            }
+        SectionHeader {
+          width: parent.width
+          text: model.user + ' ' + new Date(model.ts * 1000).toLocaleTimeString()
         }
+      }
     }
+
+    footer: TextArea {
+      id: textAreaMessage
+      width: parent.width
+      placeholderText: qsTr("Enter message here")
+
+      EnterKey.enabled: text.length > 0
+      EnterKey.iconSource: "image://theme/icon-m-enter-accept"
+      EnterKey.onClicked: {
+        Logic.sendMessage(text)
+        text = ""
+      }
+    }
+  }
 }
