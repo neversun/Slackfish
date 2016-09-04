@@ -72,7 +72,6 @@ install -d %{buildroot}%{_datadir}/%{name}/qml/i18n
 install -m 0444 -t %{buildroot}%{_datadir}/%{name}/qml qml/*.qml
 install -m 0444 -t %{buildroot}%{_datadir}/%{name}/qml/pages qml/pages/*.qml
 install -m 0444 -t %{buildroot}%{_datadir}/%{name}/qml/images qml/images/*.png
-install -m 0444 -t %{buildroot}%{_datadir}/%{name}/qml/js/ qml/js/*.js
 install -m 0444 -t %{buildroot}%{_datadir}/%{name}/qml/js/logic qml/js/logic/*.js
 install -m 0444 -t %{buildroot}%{_datadir}/%{name}/qml/js/services qml/js/services/*.js
 #install -m 0444 -t %{buildroot}%{_datadir}/%{name}/qml/i18n i18n/*.qm

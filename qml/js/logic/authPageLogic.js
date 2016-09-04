@@ -1,37 +1,33 @@
-.import "../applicationShared.js" as Globals
-
-function workerOnMessage(messageObject) {
-    if(messageObject.apiMethod === 'oauth.access') {
-        tokenReceived(messageObject.data);
-    } else {
-        anyMessageReceived(messageObject);
-    }
+function workerOnMessage (messageObject) {
+  if (messageObject.apiMethod === 'oauth.access') {
+    tokenReceived(messageObject.data.access_token)
+  }
 }
 
-function webViewUrlChanged(url) {
-    if(url.toString().indexOf(redirect_uri)==0) {
-        //Success
-        console.log(url);
-        var extractedCode = url.toString().substring(redirect_uri.length + 6).replace("&state=","");
-        authentificated(extractedCode);
-    } else {
-        console.log(url);
-    }
+function webViewUrlChanged (url) {
+  url = url.toString()
+  if (url.indexOf('redirect_uri') !== -1) {
+    return
+  }
+
+  var codeIndex = url.indexOf('code=')
+  if (codeIndex === -1) {
+    return
+  }
+
+  authentificated(url.substring(codeIndex + 5).replace('&state=', ''))
 }
 
-// private
-
-function anyMessageReceived(data) {
-    console.log(JSON.stringify(data));
+function authentificated (code) {
+  slackWorker.sendMessage({'apiMethod': 'oauth.access', 'code': code})
 }
 
-function authentificated(code) {
-    console.log(authPage.slack_api_code);
-    slackWorker.sendMessage({'apiMethod': "oauth.access", 'code': code});
-}
+function tokenReceived (token) {
+  // TODO: check if token is valid right now
+  slackfishctrl.slack.connect(token)
 
-function tokenReceived(data) {
-    Globals.slackToken = data.access_token;
+  pageStack.replace(Qt.resolvedUrl('../../pages/ChannelListPage.qml'))
 
-      pageStack.replace(Qt.resolvedUrl("../../pages/ChannelListPage.qml"))
+  slackfishctrl.settings.setToken(token)
+  slackfishctrl.settings.save()
 }

@@ -31,13 +31,19 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "pages"
+import "js/logic/authPageLogic.js" as AuthLogic
 
 ApplicationWindow
 {
-    initialPage: Qt.resolvedUrl("pages/AuthPage.qml")
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
     allowedOrientations: Orientation.All
     _defaultPageOrientations: Orientation.All
+
+    Component.onCompleted: {
+      if (slackfishctrl.settings.token !== '') {
+        AuthLogic.tokenReceived(slackfishctrl.settings.token)
+      } else {
+        pageStack.push(Qt.resolvedUrl("pages/AuthPage.qml"))
+      }
+    }
 }
-
-

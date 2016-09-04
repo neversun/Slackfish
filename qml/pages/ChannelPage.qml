@@ -1,32 +1,18 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import "../js/logic/channelPageLogic.js" as Logic
 
 Page {
   id: channelPage
 
   // properties from lower stack page
-  property variant    channelName
-  property variant    channelID
+  property variant    channelIndex
+  //
 
-  property string channelPurpose
 
-  ListModel {
-    id: messagesModel
-  }
-
-  WorkerScript {
-    id: slackWorker
-    source: "../js/services/slackWorker.js"
-    onMessage: {
-      Logic.workerOnMessage(messageObject);
-    }
-  }
-
+  property variant channel
 
   Component.onCompleted: {
-    Logic.loadChannelInfo();
-    Logic.loadChannelHistory();
+    channelPage.channel = slackfishctrl.channels.get(channelIndex)
   }
 
   SilicaListView {
@@ -39,7 +25,7 @@ Page {
       width: parent.width
 
       PageHeader {
-        title: '#' + channelPage.channelName
+        title: '#' + channelPage.channel.name
       }
 
       Label {
@@ -47,7 +33,7 @@ Page {
         wrapMode: TextEdit.WordWrap
         textFormat: Text.RichText
         font.pixelSize: Theme.fontSizeSmall
-        text: channelPage.channelPurpose
+        text: channelPage.channel.purpose.value
         color: Theme.secondaryColor
       }
     }

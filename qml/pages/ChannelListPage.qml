@@ -5,42 +5,26 @@ import "../js/logic/channelListPageLogic.js" as Logic
 Page {
   id: channelListPage
 
-  ListModel {
-    id: channelListModel
-  }
-
-
-  WorkerScript {
-    id: slackWorker
-    source: "../js/services/slackWorker.js"
-    onMessage: {
-      Logic.workerOnMessage(messageObject);
-    }
-  }
-
-
   Component.onCompleted: {
-    Logic.loadChannels();
+    slackfishctrl.channels.getChannels(false);
   }
 
   // -------------------------
 
-
-
   SilicaListView {
     anchors.fill: parent
 
-    model: channelListModel
+    model: slackfishctrl.channels.len
 
     header: PageHeader {
       title: qsTr("Channels")
     }
 
     delegate: ListItem {
-      onClicked: { pageStack.push(Qt.resolvedUrl("ChannelPage.qml"), { channelName: model.name, channelID: model.id  }) }
+      onClicked: { pageStack.push(Qt.resolvedUrl("ChannelPage.qml"), { channelIndex: index, channelName: slackfishctrl.channels.get(index).name }) }
 
       Label {
-        text: '#' + model.name
+        text: '#' + slackfishctrl.channels.get(index).name
         font.pixelSize: Theme.fontSizeLarge
         width: parent.width
         color: highlighted ? Theme.highlightColor : Theme.primaryColor

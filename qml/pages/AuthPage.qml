@@ -5,7 +5,7 @@ import "../js/logic/authPageLogic.js" as Logic
 Page {
     id: authPage
     property string client_id: "14600308501.14604351382"
-    property string scope: "channels:read channels:history chat:write:user"
+    property string scope: "client"
     property string redirect_uri : "http://0.0.0.0:12345/oauth"
     property string auth_url : "https://slack.com/oauth/authorize?client_id=" + client_id + "&scope=" + scope + "&redirect_uri=" + redirect_uri
     property bool showWebview : false
