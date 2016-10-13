@@ -21,7 +21,9 @@ Page {
     }
 
     delegate: ListItem {
-      onClicked: { pageStack.push(Qt.resolvedUrl("ChannelPage.qml"), { channelIndex: index, channelName: slackfishctrl.channels.get(index).name }) }
+      onClicked: {
+        pageStack.push(Qt.resolvedUrl("ChannelPage.qml"), { channelIndex: index})
+      }
 
       Label {
         text: '#' + slackfishctrl.channels.get(index).name

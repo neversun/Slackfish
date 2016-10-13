@@ -13,6 +13,11 @@ var messageID = 0
 var token string
 
 type Slack struct {
+	messages *Messages
+}
+
+func (s *Slack) Init(msgs *Messages) {
+	s.messages = msgs
 }
 
 // SendMessage sends a message to channel name or group/DM ID
@@ -59,6 +64,7 @@ func processEvents(s *Slack) {
 
 			case *slackApi.MessageEvent:
 				fmt.Printf("Message: %v\n", ev)
+				s.messages.Add(ev)
 
 			case *slackApi.PresenceChangeEvent:
 				fmt.Printf("Presence Change: %v\n", ev)

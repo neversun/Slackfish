@@ -21,6 +21,7 @@ type SlackfishControl struct {
 	Slack    *slack.Slack
 	Channels *slack.Channels
 	Settings *settings.Settings
+	Messages *slack.Messages
 }
 
 func main() {
@@ -31,10 +32,17 @@ func main() {
 }
 
 func run() error {
+	cs := &slack.Channels{}
+	ss := &settings.Settings{}
+	ms := &slack.Messages{}
+	s := &slack.Slack{}
+	s.Init(ms)
+
 	slackfish := SlackfishControl{
-		Slack:    &slack.Slack{},
-		Channels: &slack.Channels{},
-		Settings: &settings.Settings{},
+		Slack:    s,
+		Channels: cs,
+		Settings: ss,
+		Messages: ms,
 	}
 
 	engine := qml.SailfishNewEngine()
@@ -44,8 +52,8 @@ func run() error {
 		panic(err)
 	}
 	dataDir := filepath.Join(path, ".local", "share", Appname)
-	s := settings.Settings{Location: filepath.Join(dataDir, "settings.yml")}
-	slackfish.Settings = &s
+	set := settings.Settings{Location: filepath.Join(dataDir, "settings.yml")}
+	slackfish.Settings = &set
 
 	if err = slackfish.Settings.Load(); err != nil {
 		log.Printf("WARN: %+v\n", err)

@@ -28,6 +28,6 @@ function tokenReceived (token) {
 
   pageStack.replace(Qt.resolvedUrl('../../pages/ChannelListPage.qml'))
 
-  slackfishctrl.settings.setToken(token)
+  slackfishctrl.settings.token = token
   slackfishctrl.settings.save()
 }

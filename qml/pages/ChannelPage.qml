@@ -10,16 +10,33 @@ Page {
 
 
   property variant channel
+  property variant messages
+  property int messageLen: slackfishctrl.messages.len
+
+  onMessageLenChanged: {
+    refreshMessages()
+  }
+
+  function refreshMessages () {
+    if (!channel) {
+      return
+    }
+    var msg = slackfishctrl.messages.getLatest(channel.id)
+    if (msg && msg.channel) {
+      messagesList.model.append(msg)
+    }
+  }
 
   Component.onCompleted: {
-    channelPage.channel = slackfishctrl.channels.get(channelIndex)
+    channel = slackfishctrl.channels.get(channelIndex)
+    messages = slackfishctrl.messages
   }
 
   SilicaListView {
+    id: messagesList
     anchors.fill: parent
     anchors.margins: Theme.horizontalPageMargin
-    id: channelList
-    model: messagesModel
+    model: ListModel{}
 
     header: Column {
       width: parent.width
@@ -56,7 +73,7 @@ Page {
 
         SectionHeader {
           width: parent.width
-          text: model.user + ' ' + new Date(model.ts * 1000).toLocaleTimeString()
+          text: model.user + ' ' + new Date(model.timestamp * 1000).toLocaleTimeString()
         }
       }
     }
