@@ -27,9 +27,21 @@ Page {
     }
   }
 
+  function loadMessages () {
+    var messages = slackfishctrl.messages.getAll(channel.id)
+    if (messages) {
+      messages = JSON.parse(messages)
+      messages.forEach(function (m) {
+        messagesList.model.append(m)
+      })
+    }
+  }
+
   Component.onCompleted: {
     channel = slackfishctrl.channels.get(channelIndex)
     messages = slackfishctrl.messages
+
+    loadMessages()
   }
 
   SilicaListView {

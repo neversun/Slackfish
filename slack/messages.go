@@ -2,20 +2,20 @@ package slack
 
 import qml "gopkg.in/qml.v1"
 import slackApi "github.com/nlopes/slack"
+import "encoding/json"
 
 type Messages struct {
-	channelIDLatestMessageID map[string]int
-	list                     []Message
-	Len                      int
+	list []Message
+	Len  int
 }
 
 type Message struct {
-	Type      string
-	Channel   string
-	User      string
-	Text      string
-	Timestamp string
-	IsStarred bool
+	Type      string `json:"type"`
+	Channel   string `json:"channel"`
+	User      string `json:"user"`
+	Text      string `json:"text"`
+	Timestamp string `json:"timestamp"`
+	IsStarred bool   `json:"isStarred"`
 	// PinnedTo []string
 	// Attachments []Attachment
 	// Edited *Edited
@@ -32,13 +32,21 @@ func (m *Message) transformFromBackend(msg *slackApi.MessageEvent) {
 
 // GetLatest returns the latest message for given channel
 func (ms *Messages) GetLatest(channelID string) Message {
-	mIndex := ms.Len - 1
-	m := ms.list[mIndex]
-	if m.Channel == channelID && ms.channelIDLatestMessageID[m.Channel] < mIndex {
-		ms.channelIDLatestMessageID[m.Channel] = mIndex
+	if m.Channel == channelID {
 		return m
 	}
 	return Message{}
+}
+
+func (ms *Messages) GetAll(channelID string) string {
+	var mf []Message
+	for _, m := range ms.list {
+		if m.Channel == channelID {
+			mf = append(mf, m)
+		}
+	}
+	s, _ := json.Marshal(mf)
+	return string(s)
 }
 
 func (ms *Messages) Add(msg *slackApi.MessageEvent) {
