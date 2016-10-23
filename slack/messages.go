@@ -53,6 +53,7 @@ func (ms *Messages) GetAll(channelID string) string {
 func (ms *Messages) GetAllWithHistory(channelID string, timestamp string) string {
 	params := slackApi.HistoryParameters{
 		Count:  30,
+		Inclusive: true,
 	}
 	if (timestamp != "") {
 		params.Latest = timestamp
@@ -66,9 +67,9 @@ func (ms *Messages) GetAllWithHistory(channelID string, timestamp string) string
 	infoLn("66", h)
 
 	var tmpMs []Message
-	for _, m := range h.Messages {
+	for i := len(h.Messages)-1; i > 0; i-- {
 		msg := Message{}
-		msg.transformFromBackend(&m.Msg)
+		msg.transformFromBackend(&h.Messages[i].Msg)
 		msg.Channel = channelID
 		tmpMs = append(tmpMs, msg)
 	}

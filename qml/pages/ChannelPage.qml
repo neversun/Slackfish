@@ -34,7 +34,12 @@ Page {
   function loadChannelHistory () {
     var msg = messagesList && messagesList.model.get(0)
     var timestamp = msg && msg.timestamp || ''
-    appendMessagesToModel(slackfishctrl.messages.getAllWithHistory(channel.id, timestamp))
+    var messagesJson = slackfishctrl.messages.getAllWithHistory(channel.id, timestamp)
+    if (messagesJson.length < 3) {
+      return
+    }
+    messagesList.model.clear()
+    appendMessagesToModel(messagesJson)
   }
 
   function appendMessagesToModel (messages) {
