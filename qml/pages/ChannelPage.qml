@@ -28,27 +28,52 @@ Page {
   }
 
   function loadMessages () {
-    var messages = slackfishctrl.messages.getAll(channel.id)
-    if (messages) {
-      messages = JSON.parse(messages)
-      messages.forEach(function (m) {
-        messagesList.model.append(m)
-      })
-    }
+    appendMessagesToModel(slackfishctrl.messages.getAll(channel.id))
   }
+
+  function loadChannelHistory () {
+    var msg = messagesList && messagesList.model.get(0)
+    var timestamp = msg && msg.timestamp || ''
+    appendMessagesToModel(slackfishctrl.messages.getAllWithHistory(channel.id, timestamp))
+  }
+
+  function appendMessagesToModel (messages) {
+    // go binding returns null as string
+    if (messages === 'null') {
+      return
+    }
+    messages = JSON.parse(messages)
+    console.log(messages)
+    console.log(JSON.stringify(messages))
+    messages.forEach(function (m) {
+      messagesList.model.append(m)
+    })
+  }
+
 
   Component.onCompleted: {
     channel = slackfishctrl.channels.get(channelIndex)
     messages = slackfishctrl.messages
 
     loadMessages()
+    if (messagesList.count === 0) {
+      loadChannelHistory()
+    }
   }
+
 
   SilicaListView {
     id: messagesList
     anchors.fill: parent
     anchors.margins: Theme.horizontalPageMargin
     model: ListModel{}
+
+    PullDownMenu {
+      MenuItem {
+        text: "load more messages"
+        onClicked: loadChannelHistory()
+      }
+    }
 
     header: Column {
       width: parent.width
@@ -102,5 +127,6 @@ Page {
         text = ""
       }
     }
+    // TODO: footerPositioning: ListView.OverlayFooter
   }
 }

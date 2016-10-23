@@ -21,7 +21,7 @@ type Message struct {
 	// Edited *Edited
 }
 
-func (m *Message) transformFromBackend(msg *slackApi.MessageEvent) {
+func (m *Message) transformFromBackend(msg *slackApi.Msg) {
 	m.Type = msg.Type
 	m.Channel = msg.Channel
 	m.User = msg.User
@@ -32,6 +32,7 @@ func (m *Message) transformFromBackend(msg *slackApi.MessageEvent) {
 
 // GetLatest returns the latest message for given channel
 func (ms *Messages) GetLatest(channelID string) Message {
+	m := ms.list[len(ms.list)-1]
 	if m.Channel == channelID {
 		return m
 	}
@@ -39,20 +40,50 @@ func (ms *Messages) GetLatest(channelID string) Message {
 }
 
 func (ms *Messages) GetAll(channelID string) string {
-	var mf []Message
+	var chMsg []Message
 	for _, m := range ms.list {
 		if m.Channel == channelID {
-			mf = append(mf, m)
+			chMsg = append(chMsg, m)
 		}
 	}
-	s, _ := json.Marshal(mf)
+	s, _ := json.Marshal(chMsg)
 	return string(s)
 }
 
-func (ms *Messages) Add(msg *slackApi.MessageEvent) {
+func (ms *Messages) GetAllWithHistory(channelID string, timestamp string) string {
+	params := slackApi.HistoryParameters{
+		Count:  30,
+	}
+	if (timestamp != "") {
+		params.Latest = timestamp
+	}
+
+	h, err := API.GetChannelHistory(channelID, params)
+	if err != nil {
+		errorLn(err.Error())
+		return ""
+	}
+	infoLn("66", h)
+
+	var tmpMs []Message
+	for _, m := range h.Messages {
+		msg := Message{}
+		msg.transformFromBackend(&m.Msg)
+		msg.Channel = channelID
+		tmpMs = append(tmpMs, msg)
+	}
+	ms.list = append(tmpMs, ms.list...)
+	ms.Len = len(ms.list)
+	infoLn(ms.list)
+	s, _ := json.Marshal(ms.list)
+	return string(s)
+}
+
+func (ms *Messages) Add(msg *slackApi.Msg) {
 	m := Message{}
 	m.transformFromBackend(msg)
 
+	infoLn("Add", m)
 	ms.list = append(ms.list, m)
 	ms.Len = len(ms.list)
 

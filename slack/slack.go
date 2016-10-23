@@ -64,7 +64,7 @@ func processEvents(s *Slack) {
 
 			case *slackApi.MessageEvent:
 				fmt.Printf("Message: %v\n", ev)
-				s.messages.Add(ev)
+				s.messages.Add(&ev.Msg)
 
 			case *slackApi.PresenceChangeEvent:
 				fmt.Printf("Presence Change: %v\n", ev)
