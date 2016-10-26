@@ -3,6 +3,8 @@ package slack
 import qml "gopkg.in/qml.v1"
 import slackApi "github.com/nlopes/slack"
 
+var ChannelsByID map[string]*Channel
+
 type Channels struct {
 	list []Channel
 	Len  int

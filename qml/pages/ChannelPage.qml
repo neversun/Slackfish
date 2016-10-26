@@ -10,16 +10,75 @@ Page {
 
 
   property variant channel
+  property variant messages
+  property int messageLen: slackfishctrl.messages.len
 
-  Component.onCompleted: {
-    channelPage.channel = slackfishctrl.channels.get(channelIndex)
+  onMessageLenChanged: {
+    refreshMessages()
   }
 
+  function refreshMessages () {
+    if (!channel) {
+      return
+    }
+    var msg = slackfishctrl.messages.getLatest(channel.id)
+    if (msg && msg.channel) {
+      messagesList.model.append(msg)
+    }
+  }
+
+  function loadMessages () {
+    appendMessagesToModel(slackfishctrl.messages.getAll(channel.id))
+  }
+
+  function loadChannelHistory () {
+    var msg = messagesList && messagesList.model.get(0)
+    var timestamp = msg && msg.timestamp || ''
+    var messagesJson = slackfishctrl.messages.getAllWithHistory(channel.id, timestamp)
+    if (messagesJson.length < 3) {
+      return
+    }
+    messagesList.model.clear()
+    appendMessagesToModel(messagesJson)
+  }
+
+  function appendMessagesToModel (messages) {
+    // go binding returns null as string
+    if (messages === 'null') {
+      return
+    }
+    messages = JSON.parse(messages)
+    console.log(messages)
+    console.log(JSON.stringify(messages))
+    messages.forEach(function (m) {
+      messagesList.model.append(m)
+    })
+  }
+
+
+  Component.onCompleted: {
+    channel = slackfishctrl.channels.get(channelIndex)
+    messages = slackfishctrl.messages
+
+    loadMessages()
+    if (messagesList.count === 0) {
+      loadChannelHistory()
+    }
+  }
+
+
   SilicaListView {
+    id: messagesList
     anchors.fill: parent
     anchors.margins: Theme.horizontalPageMargin
-    id: channelList
-    model: messagesModel
+    model: ListModel{}
+
+    PullDownMenu {
+      MenuItem {
+        text: "load more messages"
+        onClicked: loadChannelHistory()
+      }
+    }
 
     header: Column {
       width: parent.width
@@ -56,7 +115,7 @@ Page {
 
         SectionHeader {
           width: parent.width
-          text: model.user + ' ' + new Date(model.ts * 1000).toLocaleTimeString()
+          text: model.user + ' ' + new Date(model.timestamp * 1000).toLocaleTimeString()
         }
       }
     }
@@ -73,5 +132,6 @@ Page {
         text = ""
       }
     }
+    // TODO: footerPositioning: ListView.OverlayFooter
   }
 }
