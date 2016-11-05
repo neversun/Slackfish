@@ -5,7 +5,7 @@ Page {
   id: channelListPage
 
   Component.onCompleted: {
-    slackfishctrl.channels.getChannels(false);
+    channelsModel.getChannels(false);
   }
 
   // -------------------------
@@ -13,7 +13,7 @@ Page {
   SilicaListView {
     anchors.fill: parent
 
-    model: slackfishctrl.channels.len
+    model: channelsModel.len
 
     header: PageHeader {
       title: qsTr("Channels")
@@ -25,7 +25,7 @@ Page {
       }
 
       Label {
-        text: '#' + slackfishctrl.channels.get(index).name
+        text: '#' + channelsModel.get(index).name
         font.pixelSize: Theme.fontSizeLarge
         width: parent.width
         color: highlighted ? Theme.highlightColor : Theme.primaryColor

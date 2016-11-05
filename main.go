@@ -17,11 +17,11 @@ const (
 )
 
 type SlackfishControl struct {
-	Root     qml.Object
-	Slack    *slack.Slack
-	Channels *slack.Channels
-	Settings *settings.Settings
-	Messages *slack.Messages
+	Root          qml.Object
+	Slack         *slack.Slack
+	ChannelsModel *slack.Channels
+	SettingsModel *settings.Settings
+	MessagesModel *slack.Messages
 }
 
 func main() {
@@ -39,10 +39,10 @@ func run() error {
 	s.Init(ms)
 
 	slackfish := SlackfishControl{
-		Slack:    s,
-		Channels: cs,
-		Settings: ss,
-		Messages: ms,
+		Slack:         s,
+		ChannelsModel: cs,
+		SettingsModel: ss,
+		MessagesModel: ms,
 	}
 
 	engine := qml.SailfishNewEngine()
@@ -53,9 +53,9 @@ func run() error {
 	}
 	dataDir := filepath.Join(path, ".local", "share", Appname)
 	set := settings.Settings{Location: filepath.Join(dataDir, "settings.yml")}
-	slackfish.Settings = &set
+	slackfish.SettingsModel = &set
 
-	if err = slackfish.Settings.Load(); err != nil {
+	if err = slackfish.SettingsModel.Load(); err != nil {
 		log.Printf("WARN: %+v\n", err)
 	}
 
@@ -64,6 +64,8 @@ func run() error {
 
 	context := engine.Context()
 	context.SetVar("slackfishctrl", &slackfish)
+	// publish direct bindings to public members of slackfish
+	context.SetVars(&slackfish)
 
 	controls, err := engine.SailfishSetSource("qml/" + Appname + ".qml")
 	if err != nil {

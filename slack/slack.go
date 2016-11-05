@@ -20,19 +20,6 @@ func (s *Slack) Init(msgs *Messages) {
 	s.messages = msgs
 }
 
-// SendMessage sends a message to channel name or group/DM ID
-func (s *Slack) SendMessage(channel string, text string) {
-	msg := slackApi.OutgoingMessage{
-		ID:      messageID,
-		Channel: channel,
-		Text:    text,
-		Type:    "message",
-	}
-	messageID++
-
-	slackRtm.SendMessage(&msg)
-}
-
 // Connect establishes a connection to slack API
 func (s *Slack) Connect(tkn string) {
 	token = tkn
@@ -59,8 +46,6 @@ func processEvents(s *Slack) {
 			case *slackApi.ConnectedEvent:
 				fmt.Println("Infos:", ev.Info)
 				fmt.Println("Connection counter:", ev.ConnectionCount)
-				// Replace #general with your Channel ID
-				slackRtm.SendMessage(slackRtm.NewOutgoingMessage("Hello world", "#general"))
 
 			case *slackApi.MessageEvent:
 				fmt.Printf("Message: %v\n", ev)
@@ -78,6 +63,10 @@ func processEvents(s *Slack) {
 			case *slackApi.InvalidAuthEvent:
 				fmt.Printf("Invalid credentials")
 				break
+
+			case *slackApi.AckMessage:
+				fmt.Printf("AckMessage: %+v\n", msg.Data)
+				// s.messages.MarkSent(msg.Data)
 
 			default:
 

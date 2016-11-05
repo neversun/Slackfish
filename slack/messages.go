@@ -2,7 +2,10 @@ package slack
 
 import qml "gopkg.in/qml.v1"
 import slackApi "github.com/nlopes/slack"
-import "encoding/json"
+import (
+	"encoding/json"
+	"strconv"
+)
 
 type Messages struct {
 	list []Message
@@ -10,12 +13,14 @@ type Messages struct {
 }
 
 type Message struct {
-	Type      string `json:"type"`
-	Channel   string `json:"channel"`
-	User      string `json:"user"`
-	Text      string `json:"text"`
-	Timestamp string `json:"timestamp"`
-	IsStarred bool   `json:"isStarred"`
+	Type       string `json:"type"`
+	Channel    string `json:"channel"`
+	User       string `json:"user"`
+	Text       string `json:"text"`
+	Timestamp  string `json:"timestamp"`
+	IsStarred  bool   `json:"isStarred"`
+	ID         int
+	Processing bool
 	// PinnedTo []string
 	// Attachments []Attachment
 	// Edited *Edited
@@ -43,6 +48,7 @@ func (ms *Messages) GetAll(channelID string) string {
 	var chMsg []Message
 	for _, m := range ms.list {
 		if m.Channel == channelID {
+			infoLn("GetAll: Adding this messages", m)
 			chMsg = append(chMsg, m)
 		}
 	}
@@ -52,10 +58,10 @@ func (ms *Messages) GetAll(channelID string) string {
 
 func (ms *Messages) GetAllWithHistory(channelID string, timestamp string) string {
 	params := slackApi.HistoryParameters{
-		Count:  30,
+		Count:     30,
 		Inclusive: true,
 	}
-	if (timestamp != "") {
+	if timestamp != "" {
 		params.Latest = timestamp
 	}
 
@@ -64,10 +70,9 @@ func (ms *Messages) GetAllWithHistory(channelID string, timestamp string) string
 		errorLn(err.Error())
 		return ""
 	}
-	infoLn("66", h)
 
 	var tmpMs []Message
-	for i := len(h.Messages)-1; i > 0; i-- {
+	for i := len(h.Messages) - 1; i > 0; i-- {
 		msg := Message{}
 		msg.transformFromBackend(&h.Messages[i].Msg)
 		msg.Channel = channelID
@@ -75,8 +80,8 @@ func (ms *Messages) GetAllWithHistory(channelID string, timestamp string) string
 	}
 	ms.list = append(tmpMs, ms.list...)
 	ms.Len = len(ms.list)
-	infoLn(ms.list)
-	s, _ := json.Marshal(ms.list)
+
+	s, _ := json.Marshal(tmpMs)
 	return string(s)
 }
 
@@ -84,9 +89,39 @@ func (ms *Messages) Add(msg *slackApi.Msg) {
 	m := Message{}
 	m.transformFromBackend(msg)
 
-	infoLn("Add", m)
+	ms.add(m)
+}
+
+func (ms *Messages) add(m Message) {
+	infoLn("add", m)
 	ms.list = append(ms.list, m)
+	infoLn(ms.Len)
 	ms.Len = len(ms.list)
+	infoLn(ms.Len)
 
 	qml.Changed(ms, &ms.Len)
+}
+
+func (ms *Messages) SendMessage(channelID string, text string) {
+	outgoingMsg := slackRtm.NewOutgoingMessage(text, channelID)
+	slackRtm.SendMessage(outgoingMsg)
+
+	ms.add(Message{ID: outgoingMsg.ID, Text: text, Channel: channelID, Type: "message", User: "TODO me", Timestamp: "TODO now", Processing: true})
+}
+
+func (ms *Messages) MarkSent(ID string) {
+	id, err := strconv.Atoi(ID)
+	if err != nil {
+		errorLn(err.Error())
+	}
+
+	for i := ms.Len; i > 0; i-- {
+		if ms.list[i].ID != id {
+			continue
+		}
+
+		ms.list[i].Processing = false
+		qml.Changed(ms, &ms.Len)
+		return
+	}
 }

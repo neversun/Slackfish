@@ -11,30 +11,40 @@ Page {
 
   property variant channel
   property variant messages
-  property int messageLen: slackfishctrl.messages.len
+  property int messageLen: messages.len
 
   onMessageLenChanged: {
+    console.log('changed!')
     refreshMessages()
   }
 
   function refreshMessages () {
-    if (!channel) {
+    if (!channel || !messagesList.model.count) {
       return
     }
-    var msg = slackfishctrl.messages.getLatest(channel.id)
+
+    if (messagesList.model.count === messageLen) {
+      console.log('no new messages, but refreshing')
+      loadMessages()
+      return
+    }
+
+    var msg = messagesModel.getLatest(channel.id)
+    console.log(msg, JSON.stringify(msg))
     if (msg && msg.channel) {
       messagesList.model.append(msg)
     }
   }
 
   function loadMessages () {
-    appendMessagesToModel(slackfishctrl.messages.getAll(channel.id))
+    console.log('loadMessages')
+    appendMessagesToModel(messagesModel.getAll(channel.id))
   }
 
   function loadChannelHistory () {
     var msg = messagesList && messagesList.model.get(0)
     var timestamp = msg && msg.timestamp || ''
-    var messagesJson = slackfishctrl.messages.getAllWithHistory(channel.id, timestamp)
+    var messagesJson = messagesModel.getAllWithHistory(channel.id, timestamp)
     if (messagesJson.length < 3) {
       return
     }
@@ -57,21 +67,22 @@ Page {
 
 
   Component.onCompleted: {
-    channel = slackfishctrl.channels.get(channelIndex)
-    messages = slackfishctrl.messages
+    console.log(channelIndex)
+    channel = channelsModel.get(channelIndex)
+    messages = messagesModel
 
     loadMessages()
-    if (messagesList.count === 0) {
+    if (messagesList.model.count === 0) {
       loadChannelHistory()
     }
+    messagesList.positionViewAtEnd()
   }
 
 
   SilicaListView {
     id: messagesList
-    anchors.fill: parent
-    anchors.margins: Theme.horizontalPageMargin
     model: ListModel{}
+    anchors.fill: parent
 
     PullDownMenu {
       MenuItem {
@@ -81,7 +92,8 @@ Page {
     }
 
     header: Column {
-      width: parent.width
+      width: parent.width - Theme.paddingLarge
+      x: Theme.paddingLarge
 
       PageHeader {
         title: '#' + channelPage.channel.name
@@ -95,16 +107,27 @@ Page {
         text: channelPage.channel.purpose.value
         color: Theme.secondaryColor
       }
+
+      Rectangle {
+        color: "transparent"
+        width: parent.width
+        height: Theme.paddingMedium
+      }
     }
+
+
 
     delegate: ListItem {
       contentHeight: column.height
 
       Column {
         id: column
-        width: parent.width
+        width: parent.width - Theme.paddingLarge
+        anchors.verticalCenter: parent.verticalCenter
+        x: Theme.paddingLarge
 
         Label {
+          anchors.left: parent.left
           width: parent.width
           wrapMode: TextEdit.WordWrap
           text: model.text
@@ -114,6 +137,7 @@ Page {
         }
 
         SectionHeader {
+          anchors.right: parent.right
           width: parent.width
           text: model.user + ' ' + new Date(model.timestamp * 1000).toLocaleTimeString()
         }
@@ -123,15 +147,16 @@ Page {
     footer: TextArea {
       id: textAreaMessage
       width: parent.width
-      placeholderText: qsTr("Enter message here")
+      placeholderText: qsTr("Message " + '#' + channelPage.channel.name)
 
       EnterKey.enabled: text.length > 0
       EnterKey.iconSource: "image://theme/icon-m-enter-accept"
       EnterKey.onClicked: {
-        Logic.sendMessage(text)
+        channelPage.messages.sendMessage(channelPage.channel.id, text)
         text = ""
       }
     }
-    // TODO: footerPositioning: ListView.OverlayFooter
+    // TODO: enable once sailfish uses Qt >= 5.4
+    // footerPositioning: ListView.OverlayFooter
   }
 }
