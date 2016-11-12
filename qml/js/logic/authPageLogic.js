@@ -24,10 +24,10 @@ function authentificated (code) {
 
 function tokenReceived (token) {
   // TODO: check if token is valid right now
-  slackfishctrl.slack.connect(token)
+  slack.connect(token)
 
   pageStack.replace(Qt.resolvedUrl('../../pages/ChannelListPage.qml'))
 
-  slackfishctrl.settings.token = token
-  slackfishctrl.settings.save()
+  settingsModel.token = token
+  settingsModel.save()
 }

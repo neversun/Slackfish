@@ -40,8 +40,8 @@ ApplicationWindow
     _defaultPageOrientations: Orientation.All
 
     Component.onCompleted: {
-      if (slackfishctrl.settings.token !== '') {
-        AuthLogic.tokenReceived(slackfishctrl.settings.token)
+      if (settingsModel.token !== '') {
+        AuthLogic.tokenReceived(settingsModel.token)
       } else {
         pageStack.push(Qt.resolvedUrl("pages/AuthPage.qml"))
       }
