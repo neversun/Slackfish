@@ -3,6 +3,7 @@ import Sailfish.Silica 1.0
 
 Page {
   id: channelPage
+  allowedOrientations: Orientation.All
 
   // properties from lower stack page
   property variant    channelIndex
@@ -130,7 +131,7 @@ Page {
           anchors.left: parent.left
           width: parent.width
           wrapMode: TextEdit.WordWrap
-          text: model.text + model.processing
+          text: model.text
           textFormat: Text.RichText
           font.pixelSize: Theme.fontSizeSmall
           color: model.processing ? Theme.secondaryColor : Theme.primaryColor

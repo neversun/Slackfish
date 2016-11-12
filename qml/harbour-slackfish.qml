@@ -35,15 +35,14 @@ import "js/logic/authPageLogic.js" as AuthLogic
 
 ApplicationWindow
 {
-    cover: Qt.resolvedUrl("cover/CoverPage.qml")
-    allowedOrientations: Orientation.All
-    _defaultPageOrientations: Orientation.All
+  cover: Qt.resolvedUrl("cover/CoverPage.qml")
+  allowedOrientations: Orientation.All
 
-    Component.onCompleted: {
-      if (settingsModel.token !== '') {
-        AuthLogic.tokenReceived(settingsModel.token)
-      } else {
-        pageStack.push(Qt.resolvedUrl("pages/AuthPage.qml"))
-      }
+  Component.onCompleted: {
+    if (settingsModel.token !== '') {
+      AuthLogic.tokenReceived(settingsModel.token)
+    } else {
+      pageStack.push(Qt.resolvedUrl("pages/AuthPage.qml"))
     }
+  }
 }
