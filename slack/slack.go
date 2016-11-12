@@ -34,6 +34,13 @@ func (s *Slack) Connect(tkn string) {
 	go processEvents(s)
 }
 
+func (s *Slack) Disconnect() {
+	err := slackRtm.Disconnect()
+	if err != nil {
+		errorLn(err.Error())
+	}
+}
+
 func processEvents(s *Slack) {
 	for {
 		select {
