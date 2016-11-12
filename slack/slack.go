@@ -65,8 +65,8 @@ func processEvents(s *Slack) {
 				break
 
 			case *slackApi.AckMessage:
-				fmt.Printf("AckMessage: %+v\n", msg.Data)
-				// s.messages.MarkSent(msg.Data)
+				fmt.Printf("AckMessage: %+v\n", ev)
+				s.messages.MarkSent(ev.ReplyTo)
 
 			default:
 

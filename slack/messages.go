@@ -2,10 +2,7 @@ package slack
 
 import qml "gopkg.in/qml.v1"
 import slackApi "github.com/nlopes/slack"
-import (
-	"encoding/json"
-	"strconv"
-)
+import "encoding/json"
 
 type Messages struct {
 	list []Message
@@ -20,7 +17,7 @@ type Message struct {
 	Timestamp  string `json:"timestamp"`
 	IsStarred  bool   `json:"isStarred"`
 	ID         int
-	Processing bool
+	Processing bool `json:"processing"`
 	// PinnedTo []string
 	// Attachments []Attachment
 	// Edited *Edited
@@ -81,8 +78,7 @@ func (ms *Messages) GetAllWithHistory(channelID string, timestamp string) string
 	ms.list = append(tmpMs, ms.list...)
 	ms.Len = len(ms.list)
 
-	s, _ := json.Marshal(tmpMs)
-	return string(s)
+	return ms.GetAll(channelID)
 }
 
 func (ms *Messages) Add(msg *slackApi.Msg) {
@@ -109,19 +105,18 @@ func (ms *Messages) SendMessage(channelID string, text string) {
 	ms.add(Message{ID: outgoingMsg.ID, Text: text, Channel: channelID, Type: "message", User: "TODO me", Timestamp: "TODO now", Processing: true})
 }
 
-func (ms *Messages) MarkSent(ID string) {
-	id, err := strconv.Atoi(ID)
-	if err != nil {
-		errorLn(err.Error())
-	}
-
-	for i := ms.Len; i > 0; i-- {
-		if ms.list[i].ID != id {
+func (ms *Messages) MarkSent(ID int) {
+	for i := ms.Len - 1; i > 0; i-- {
+		if ms.list[i].ID != ID {
 			continue
 		}
 
 		ms.list[i].Processing = false
+
+		tmp := ms.Len
+		ms.Len = -1
 		qml.Changed(ms, &ms.Len)
+		ms.Len = tmp
 		return
 	}
 }

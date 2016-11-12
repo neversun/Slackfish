@@ -14,7 +14,7 @@ Page {
   property int messageLen: messages.len
 
   onMessageLenChanged: {
-    console.log('changed!')
+    console.log('changed!', messageLen, messagesList.model.count)
     refreshMessages()
   }
 
@@ -23,7 +23,7 @@ Page {
       return
     }
 
-    if (messagesList.model.count === messageLen) {
+    if (messageLen === -1) {
       console.log('no new messages, but refreshing')
       loadMessages()
       return
@@ -38,6 +38,7 @@ Page {
 
   function loadMessages () {
     console.log('loadMessages')
+    messagesList.model.clear()
     appendMessagesToModel(messagesModel.getAll(channel.id))
   }
 
@@ -48,7 +49,6 @@ Page {
     if (messagesJson.length < 3) {
       return
     }
-    messagesList.model.clear()
     appendMessagesToModel(messagesJson)
   }
 
@@ -130,10 +130,10 @@ Page {
           anchors.left: parent.left
           width: parent.width
           wrapMode: TextEdit.WordWrap
-          text: model.text
+          text: model.text + model.processing
           textFormat: Text.RichText
           font.pixelSize: Theme.fontSizeSmall
-          color: Theme.primaryColor
+          color: model.processing ? Theme.secondaryColor : Theme.primaryColor
         }
 
         SectionHeader {
