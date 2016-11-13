@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../js/logic/users.js" as UsersLogic
 
 Page {
   id: channelPage
@@ -140,7 +141,8 @@ Page {
         SectionHeader {
           anchors.right: parent.right
           width: parent.width
-          text: model.user + ' ' + new Date(model.timestamp * 1000).toLocaleTimeString()
+          color: Theme.secondaryColor
+          text: UsersLogic.get([model.user]).name + ' ' + new Date(model.timestamp * 1000).toLocaleString(null, Locale.ShortFormat)
         }
       }
     }
