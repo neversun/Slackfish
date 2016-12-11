@@ -2,3 +2,14 @@ Slackfish
 -----------
 
 Slack client on Jolla Sailfish OS
+
+*Note: This project is not the source for the `"Slackfish"` application currently found in Jolla Store. That application is found [here](https://github.com/markussammallahti/harbour-slackfish).*
+
+### Project status
+
+_ | date
+:------------- | :-------------
+alpha | see [milestone alpha](https://github.com/neversun/Slackfish/milestone/1)
+beta | see [milestone beta](https://github.com/neversun/Slackfish/milestone/2)
+1.0 | see [milestone 1.0](https://github.com/neversun/Slackfish/milestone/3)
+Release to Jolla Store | TBD
