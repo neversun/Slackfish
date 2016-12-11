@@ -9,7 +9,7 @@ Page {
     if (channelsModel.len) {
       return
     }
-    channelsModel.getChannels(false);
+    channelsModel.getChannels(false)
   }
 
   // -------------------------

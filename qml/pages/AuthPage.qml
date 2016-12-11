@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import "../js/logic/authPageLogic.js" as Logic
+import "../js/logic/auth.js" as Logic
 
 Page {
     id: authPage

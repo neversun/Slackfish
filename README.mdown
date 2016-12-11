@@ -1,4 +1,4 @@
-Slackfish
+Slackfish - Slack client on Jolla Sailfish OS
 -----------
 
 Slack client on Jolla Sailfish OS
@@ -13,3 +13,19 @@ alpha | see [milestone alpha](https://github.com/neversun/Slackfish/milestone/1)
 beta | see [milestone beta](https://github.com/neversun/Slackfish/milestone/2)
 1.0 | see [milestone 1.0](https://github.com/neversun/Slackfish/milestone/3)
 Release to Jolla Store | TBD
+
+## Build on MerSDK
+
+  - Install https://github.com/nekrondev/jolla_go on MerSDK
+  - Run `make`
+
+## Install go dependencies on development machine
+
+```
+sudo apt-get install libqt5quick5 qtdeclarative5-dev qt5-qmake \
+                       libglib2.0-dev qt5-default libffi-dev libsqlite3-dev \
+                       qtbase5-private-dev qtdeclarative5-private-dev \
+                       libqt5opengl5-dev qtdeclarative5-qtquick2-plugin
+
+go get  ./...
+```

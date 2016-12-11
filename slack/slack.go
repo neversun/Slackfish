@@ -14,10 +14,12 @@ var token string
 
 type Slack struct {
 	messages *Messages
+	users    *Users
 }
 
-func (s *Slack) Init(msgs *Messages) {
+func (s *Slack) Init(msgs *Messages, users *Users) {
 	s.messages = msgs
+	s.users = users
 }
 
 // Connect establishes a connection to slack API
@@ -26,9 +28,12 @@ func (s *Slack) Connect(tkn string) {
 	API = slackApi.New(tkn)
 
 	slackApi.SetLogger(logger)
-	API.SetDebug(true)
+	API.SetDebug(false)
 
 	slackRtm = API.NewRTM()
+	info, _, _ := slackRtm.StartRTM()
+	s.users.AddUsers(info.Users)
+
 	go slackRtm.ManageConnection()
 
 	go processEvents(s)
@@ -77,7 +82,7 @@ func processEvents(s *Slack) {
 
 			default:
 
-				fmt.Printf("Unexpected: %v\n", msg.Data)
+				fmt.Printf("Unexpected (%+v): %v\n", ev, msg.Data)
 			}
 		}
 	}

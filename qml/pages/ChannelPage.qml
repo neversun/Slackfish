@@ -1,12 +1,13 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../js/logic/users.js" as UsersLogic
 
 Page {
   id: channelPage
   allowedOrientations: Orientation.All
 
   // properties from lower stack page
-  property variant    channelIndex
+  property variant channelIndex
   //
 
 
@@ -135,12 +136,15 @@ Page {
           textFormat: Text.RichText
           font.pixelSize: Theme.fontSizeSmall
           color: model.processing ? Theme.secondaryColor : Theme.primaryColor
+          onLinkActivated: UsersLogic.handleLink(link)
         }
 
         SectionHeader {
           anchors.right: parent.right
           width: parent.width
-          text: model.user + ' ' + new Date(model.timestamp * 1000).toLocaleTimeString()
+          color: Theme.secondaryColor
+          text: '<a href="slackfish://Profile/' + model.user + '">' + UsersLogic.get([model.user]).name + ' ' + new Date(model.timestamp * 1000).toLocaleString(null, Locale.ShortFormat) + '</a>'
+          onLinkActivated: UsersLogic.handleLink(link)
         }
       }
     }

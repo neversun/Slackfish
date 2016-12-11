@@ -22,6 +22,7 @@ type SlackfishControl struct {
 	ChannelsModel *slack.Channels
 	SettingsModel *settings.Settings
 	MessagesModel *slack.Messages
+	UsersModel    *slack.Users
 }
 
 func main() {
@@ -36,13 +37,15 @@ func run() error {
 	ss := &settings.Settings{}
 	ms := &slack.Messages{}
 	s := &slack.Slack{}
-	s.Init(ms)
+	us := &slack.Users{}
+	s.Init(ms, us)
 
 	slackfish := SlackfishControl{
 		Slack:         s,
 		ChannelsModel: cs,
 		SettingsModel: ss,
 		MessagesModel: ms,
+		UsersModel:    us,
 	}
 
 	engine := qml.SailfishNewEngine()
