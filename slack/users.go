@@ -12,27 +12,69 @@ type Users struct {
 }
 
 type User struct {
-	// Profile           UserProfile
-	ID                string `json:"id"`
-	Name              string `json:"name"`
-	Deleted           bool   `json:"deleted"`
-	Color             string `json:"color"`
-	RealName          string `json:"realName"`
-	TZ                string `json:"tz"`
-	TZLabel           string `json:"tzLabel"`
-	TZOffset          int    `json:"tzOffset"`
-	IsBot             bool   `json:"isBot"`
-	IsAdmin           bool   `json:"isAdmin"`
-	IsOwner           bool   `json:"isOwner"`
-	IsPrimaryOwner    bool   `json:"isPrimaryOwner"`
-	IsRestricted      bool   `json:"isRestricted"`
-	IsUltraRestricted bool   `json:"isUltraRestricted"`
-	Has2FA            bool   `json:"has2FA"`
-	HasFiles          bool   `json:"hasFiles"`
-	Presence          string `json:"presence"`
+	Profile           UserProfile `json:"profile"`
+	ID                string      `json:"id"`
+	Name              string      `json:"name"`
+	Deleted           bool        `json:"deleted"`
+	Color             string      `json:"color"`
+	RealName          string      `json:"realName"`
+	TZ                string      `json:"tz"`
+	TZLabel           string      `json:"tzLabel"`
+	TZOffset          int         `json:"tzOffset"`
+	IsBot             bool        `json:"isBot"`
+	IsAdmin           bool        `json:"isAdmin"`
+	IsOwner           bool        `json:"isOwner"`
+	IsPrimaryOwner    bool        `json:"isPrimaryOwner"`
+	IsRestricted      bool        `json:"isRestricted"`
+	IsUltraRestricted bool        `json:"isUltraRestricted"`
+	Has2FA            bool        `json:"has2FA"`
+	HasFiles          bool        `json:"hasFiles"`
+	Presence          string      `json:"presence"`
+}
+
+type UserProfile struct {
+	FirstName          string `json:"firstName"`
+	LastName           string `json:"lastName"`
+	RealName           string `json:"realName"`
+	RealNameNormalized string `json:"realNameNormalized"`
+	Email              string `json:"email"`
+	Skype              string `json:"skype"`
+	Phone              string `json:"phone"`
+	Image24            string `json:"image24"`
+	Image32            string `json:"image32"`
+	Image48            string `json:"image48"`
+	Image72            string `json:"image72"`
+	Image192           string `json:"image192"`
+	ImageOriginal      string `json:"imageOriginal"`
+	Title              string `json:"title"`
+	BotID              string `json:"botId,omitempty"`
+	APIAppID           string `json:"apiAppId,omitempty"`
+}
+
+func (up *UserProfile) transformFromBack(userProfile *slackApi.UserProfile) {
+	up.FirstName = userProfile.FirstName
+	up.LastName = userProfile.LastName
+	up.RealName = userProfile.RealName
+	up.RealNameNormalized = userProfile.RealNameNormalized
+	up.Email = userProfile.Email
+	up.Skype = userProfile.Skype
+	up.Phone = userProfile.Phone
+	up.Image24 = userProfile.Image24
+	up.Image32 = userProfile.Image32
+	up.Image48 = userProfile.Image48
+	up.Image72 = userProfile.Image72
+	up.Image192 = userProfile.Image192
+	up.ImageOriginal = userProfile.ImageOriginal
+	up.Title = userProfile.Title
+	// up.BotID = userProfile.BotID // FIXME: not defined on *slackApi.UserProfile
+	// up.APIAppID = userProfile.ApiAppID // FIXME: not defined on *slackApi.UserProfile
 }
 
 func (u *User) transformFromBackend(user *slackApi.User) {
+	up := UserProfile{}
+	up.transformFromBack(&user.Profile)
+	u.Profile = up
+
 	u.ID = user.ID
 	u.Name = user.Name
 	u.Deleted = user.Deleted

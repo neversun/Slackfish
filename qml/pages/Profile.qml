@@ -10,12 +10,16 @@ Page{
   property variant value
   //
   property variant user
+  property variant model
 
   Component.onCompleted: {
-    console.log(value)
     user = UsersLogic.get(value)
-    console.log(user)
     console.log(JSON.stringify(user))
+
+    model = {
+      source: user.profile.imageOriginal || user.profile.image192,
+      name: user.name
+    }
   }
 
   SilicaFlickable {
@@ -39,6 +43,19 @@ Page{
       Column {
         id: portrait
         width: parent.width
+
+        Image {
+          anchors.horizontalCenter: parent.horizontalCenter
+
+          asynchronous : true
+          fillMode : Image.PreserveAspectFit
+          source: profilePage.model.source
+
+          MouseArea {
+            anchors.fill: parent
+            onClicked: pageStack.push(Qt.resolvedUrl("Image.qml"), {model: profilePage.model})
+          }
+        }
 
         SectionHeader {
           text: qsTr('Real Name')
@@ -65,7 +82,7 @@ Page{
           value: user.isOwner
         }
         DetailItem {
-          label: qstr('Restricted')
+          label: qsTr('Restricted')
           value: user.isRestricted
         }
       }
