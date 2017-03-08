@@ -7,13 +7,14 @@ Page{
   allowedOrientations: Orientation.All
 
   // properties from lower stack page
-  property variant value
+  property string id
+  property int index
   //
   property variant user
   property variant model
 
   Component.onCompleted: {
-    user = UsersLogic.get(value)
+    user = UsersLogic.get(id)
     console.log(JSON.stringify(user))
 
     model = {
@@ -89,7 +90,7 @@ Page{
 
       Button {
         anchors.horizontalCenter: parent.horizontalCenter
-        onClicked: UsersLogic.handleLink('slackfish://Chat/' + user.id)
+        onClicked: pageStack.push(Qt.resolvedUrl("ChannelPage.qml"), { channelIndex: index, type: 'im'})
         text: qsTr('Send message')
       }
     }

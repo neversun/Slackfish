@@ -10,12 +10,12 @@ function get (id) {
 }
 
 function handleLink (link) {
-    if (/^slackfish:\/\//.test(link)) {
-      var split = /^slackfish:\/\/(.*?)\/(.*)/.exec(link)
-      pageStack.push(Qt.resolvedUrl('../../pages/' + split[1] + '.qml'), { value: split[2] })
-      return
-    }
+  if (/^slackfish:\/\//.test(link)) {
+    var split = /^slackfish:\/\/(.*?)\/(.*)/.exec(link)
+    pageStack.push(Qt.resolvedUrl('../../pages/' + split[1] + '.qml'), JSON.parse(decodeURIComponent(split[2])))
+    return
+  }
 
-    console.log("external link", link)
-    Qt.openUrlExternally(link)
+  console.log('external link', link)
+  Qt.openUrlExternally(link)
 }

@@ -53,7 +53,7 @@ func (ms *Messages) GetAll(channelID string) string {
 	return string(s)
 }
 
-func (ms *Messages) GetAllWithHistory(channelID string, timestamp string) string {
+func (ms *Messages) GetAllWithHistory(channelType string, channelID string, timestamp string) string {
 	params := slackApi.HistoryParameters{
 		Count:     30,
 		Inclusive: true,
@@ -62,11 +62,19 @@ func (ms *Messages) GetAllWithHistory(channelID string, timestamp string) string
 		params.Latest = timestamp
 	}
 
-	h, err := API.GetChannelHistory(channelID, params)
+	var err error
+	var h *slackApi.History
+	if channelType == "channel" {
+		h, err = API.GetChannelHistory(channelID, params)
+	} else if channelType == "im" {
+		h, err = API.GetIMHistory(channelID, params)
+	}
 	if err != nil {
 		errorLn(err.Error())
 		return ""
 	}
+
+	infoLn(h.Messages)
 
 	var tmpMs []Message
 	for i := len(h.Messages) - 1; i > 0; i-- {

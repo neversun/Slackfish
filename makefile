@@ -1,8 +1,11 @@
 SSH_SAILFISH = ssh -p 2222 -i $(HOME)/SailfishOS/vmshare/ssh/private_keys/engine/mersdk mersdk@localhost $(1)
 
-build: sync sailfish_build deploy
+build: setup sync sailfish_build deploy
 
 deploy: sailfish_deploy
+
+setup:
+	$(call SSH_SAILFISH,'mkdir -p /home/mersdk/src/github.com/neversun/Slackfish/')
 
 sync:
 	rsync --exclude-from=.rsyncignore -Eahrve 'ssh -p 2222 -i $(HOME)/SailfishOS/vmshare/ssh/private_keys/engine/mersdk' $(HOME)/go/src/github.com/neversun/Slackfish mersdk@localhost:/home/mersdk/src/github.com/neversun

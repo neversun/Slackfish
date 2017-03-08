@@ -7,9 +7,9 @@ Page {
   allowedOrientations: Orientation.All
 
   // properties from lower stack page
-  property variant channelIndex
+  property int channelIndex
+  property string type
   //
-
 
   property variant channel
   property variant messages
@@ -41,16 +41,21 @@ Page {
   function loadMessages () {
     console.log('loadMessages')
     messagesList.model.clear()
-    appendMessagesToModel(messagesModel.getAll(channel.id))
+    console.log('cleared')
+
+    console.log('channel.id', JSON.stringify(channel))
+    var messages = messagesModel.getAll(channel.id)
+    appendMessagesToModel(messages)
   }
 
   function loadChannelHistory () {
     var msg = messagesList && messagesList.model.get(0)
     var timestamp = msg && msg.timestamp || ''
-    var messagesJson = messagesModel.getAllWithHistory(channel.id, timestamp)
+    var messagesJson = messagesModel.getAllWithHistory(type, channel.id, timestamp)
     if (messagesJson.length < 3) {
       return
     }
+    messagesList.model.clear()
     appendMessagesToModel(messagesJson)
   }
 
@@ -69,8 +74,17 @@ Page {
 
 
   Component.onCompleted: {
-    console.log(channelIndex)
-    channel = channelsModel.get(channelIndex)
+    console.log(channelIndex, type)
+    switch (type) {
+      case 'channel':
+        channel = channelsModel.get(channelIndex)
+        break
+      case 'im':
+        channel = imChannelsModel.getChannel(channelIndex)
+        console.log(channel)
+        break
+    }
+
     messages = messagesModel
 
     loadMessages()
@@ -78,6 +92,12 @@ Page {
       loadChannelHistory()
     }
     messagesList.positionViewAtEnd()
+  }
+
+  Component.onDestruction: {
+    if (type === 'im') {
+      imChannelsModel.close()
+    }
   }
 
 
@@ -98,7 +118,7 @@ Page {
       x: Theme.paddingLarge
 
       PageHeader {
-        title: '#' + channelPage.channel.name
+        title: channelPage.channel.name
       }
 
       Label {
@@ -143,7 +163,10 @@ Page {
           anchors.right: parent.right
           width: parent.width
           color: Theme.secondaryColor
-          text: '<a href="slackfish://Profile/' + model.user + '">' + UsersLogic.get([model.user]).name + ' ' + new Date(model.timestamp * 1000).toLocaleString(null, Locale.ShortFormat) + '</a>'
+          text: {
+            var params = encodeURIComponent(JSON.stringify({id: model.user, index: channelIndex}))
+            return '<a href="slackfish://Profile/' + params + '">' + UsersLogic.get([model.user]).name + ' ' + new Date(model.timestamp * 1000).toLocaleString(null, Locale.ShortFormat) + '</a>' // TODO: styling is awful!
+          }
           onLinkActivated: UsersLogic.handleLink(link)
         }
       }
