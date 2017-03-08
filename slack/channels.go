@@ -3,8 +3,6 @@ package slack
 import qml "gopkg.in/qml.v1"
 import slackApi "github.com/nlopes/slack"
 
-var ChannelsByID map[string]*Channel
-
 type Channels struct {
 	list []Channel
 	Len  int
@@ -26,6 +24,7 @@ type Channel struct {
 	// Latest             object
 	UnreadCount        int
 	UnreadCountDisplay int
+	IsIM               bool
 }
 
 type Topic struct {
@@ -52,7 +51,8 @@ func (t *Topic) transformFromBackend(topic slackApi.Topic) {
 	t.LastSet = topic.LastSet.String()
 }
 
-func (c *Channel) transformFromBackend(channel slackApi.Channel) {
+func (c *Channel) transformFromBackend(channel *slackApi.Channel) {
+	infoLn("#########################", channel)
 	t := Topic{}
 	t.transformFromBackend(channel.Topic)
 	p := Purpose{}
@@ -75,8 +75,29 @@ func (c *Channel) transformFromBackend(channel slackApi.Channel) {
 }
 
 func (cs *Channels) Get(i int) Channel {
-	infoLn(cs.list[i])
+	infoLn("Channel.Get", cs.list[i])
 	return cs.list[i]
+}
+
+// GetByID returns a Channel by id
+func (cs *Channels) GetByID(channelID string, userID string) Channel {
+	infoLn(channelID)
+
+	var channel Channel
+	for _, c := range cs.list {
+		if c.ID == channelID {
+			channel = c
+		}
+	}
+
+	// Must be a brand new channel
+	if channel.ID == "" {
+		channel.ID = channelID
+		channel.Name = Slack.Users.getInternal(userID)[userID].Name
+		channel.IsIM = true
+	}
+
+	return channel
 }
 
 func (cs *Channels) GetChannels(excludeArchived bool) {
@@ -89,11 +110,29 @@ func (cs *Channels) GetChannels(excludeArchived bool) {
 	for _, channel := range channels {
 		infoLn(channel)
 		c := Channel{}
-		c.transformFromBackend(channel)
+		c.transformFromBackend(&channel)
 
 		cs.list = append(cs.list, c)
 	}
 	cs.Len = len(cs.list)
 
 	qml.Changed(cs, &cs.Len)
+}
+
+func (cs *Channels) AddChannels(channels []slackApi.Channel) {
+	for _, channel := range channels {
+		c := Channel{}
+		c.transformFromBackend(&channel)
+		cs.list = append(cs.list, c)
+	}
+	cs.Len = len(cs.list)
+	qml.Changed(cs, &cs.Len)
+}
+
+func (cs *Channels) addChannel(c Channel) int {
+	cs.list = append(cs.list, c)
+	cs.Len = len(cs.list)
+	qml.Changed(cs, &cs.Len)
+
+	return cs.Len - 1
 }

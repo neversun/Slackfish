@@ -6,47 +6,50 @@ import (
 	slackApi "github.com/nlopes/slack"
 )
 
+// API exports API of slack package
 var API *slackApi.Client
 var slackRtm *slackApi.RTM
+var Slack = Model{}
 
 var messageID = 0
 var token string
 
-type Slack struct {
-	messages *Messages
-	users    *Users
-}
-
-func (s *Slack) Init(msgs *Messages, users *Users) {
-	s.messages = msgs
-	s.users = users
+// SlackModel represents the entity models for storing information by @API
+type Model struct {
+	Messages Messages
+	Users    Users
+	Channels Channels
+	IMs      IMs
 }
 
 // Connect establishes a connection to slack API
-func (s *Slack) Connect(tkn string) {
+func (s *Model) Connect(tkn string) {
 	token = tkn
 	API = slackApi.New(tkn)
 
 	slackApi.SetLogger(logger)
-	API.SetDebug(false)
+	API.SetDebug(true)
 
 	slackRtm = API.NewRTM()
 	info, _, _ := slackRtm.StartRTM()
-	s.users.AddUsers(info.Users)
+	s.Users.AddUsers(info.Users)
+	s.Channels.AddChannels(info.Channels)
+	s.IMs.AddIMs(info.IMs)
 
 	go slackRtm.ManageConnection()
 
 	go processEvents(s)
 }
 
-func (s *Slack) Disconnect() {
+// Disconnect from slack API
+func (s *Model) Disconnect() {
 	err := slackRtm.Disconnect()
 	if err != nil {
 		errorLn(err.Error())
 	}
 }
 
-func processEvents(s *Slack) {
+func processEvents(s *Model) {
 	for {
 		select {
 		case msg := <-slackRtm.IncomingEvents:
@@ -56,12 +59,12 @@ func processEvents(s *Slack) {
 				// Ignore hello
 
 			case *slackApi.ConnectedEvent:
-				fmt.Println("Infos:", ev.Info)
+				fmt.Printf("Infos: %+v \n", ev.Info)
 				fmt.Println("Connection counter:", ev.ConnectionCount)
 
 			case *slackApi.MessageEvent:
 				fmt.Printf("Message: %v\n", ev)
-				s.messages.Add(&ev.Msg)
+				s.Messages.Add(&ev.Msg)
 
 			case *slackApi.PresenceChangeEvent:
 				fmt.Printf("Presence Change: %v\n", ev)
@@ -78,7 +81,7 @@ func processEvents(s *Slack) {
 
 			case *slackApi.AckMessage:
 				fmt.Printf("AckMessage: %+v\n", ev)
-				s.messages.MarkSent(ev.ReplyTo)
+				s.Messages.MarkSent(ev.ReplyTo)
 
 			default:
 

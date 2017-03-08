@@ -3,14 +3,18 @@ package slack
 import (
 	"encoding/json"
 
+	qml "gopkg.in/qml.v1"
+
 	slackApi "github.com/nlopes/slack"
 )
 
+// Users holding collection of all users
 type Users struct {
 	users []User
 	Len   int
 }
 
+// User is a Slack user accounts
 type User struct {
 	Profile           UserProfile `json:"profile"`
 	ID                string      `json:"id"`
@@ -32,6 +36,7 @@ type User struct {
 	Presence          string      `json:"presence"`
 }
 
+// UserProfile holds the personal information of a @User
 type UserProfile struct {
 	FirstName          string `json:"firstName"`
 	LastName           string `json:"lastName"`
@@ -94,8 +99,8 @@ func (u *User) transformFromBackend(user *slackApi.User) {
 	u.Presence = user.Presence
 }
 
-func (us *Users) Get(ID string) string {
-	users := map[string]User{}
+func (us *Users) getUsers(ID string) (users map[string]User) {
+	users = map[string]User{}
 	if ID != "" {
 		for _, user := range us.users {
 			if user.ID != ID {
@@ -110,14 +115,29 @@ func (us *Users) Get(ID string) string {
 		}
 	}
 
+	return users
+}
+
+// Get returns a all (or a single user) as JSON string
+func (us *Users) Get(ID string) string {
+	users := us.getUsers(ID)
 	s, _ := json.Marshal(users)
+	infoLn(string(s))
 	return string(s)
 }
 
+func (us *Users) getInternal(ID string) map[string]User {
+	return us.getUsers(ID)
+}
+
+// AddUsers converts users from backend
 func (us *Users) AddUsers(users []slackApi.User) {
 	for _, user := range users {
 		u := User{}
 		u.transformFromBackend(&user)
 		us.users = append(us.users, u)
 	}
+
+	us.Len = len(us.users)
+	qml.Changed(us, &us.Len)
 }

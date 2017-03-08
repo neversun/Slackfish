@@ -13,16 +13,19 @@ import (
 )
 
 const (
+	// Appname is the package name
 	Appname = "harbour-slackfish"
 )
 
+// SlackfishControl is exported to QML and enables interaction with API
 type SlackfishControl struct {
-	Root          qml.Object
-	Slack         *slack.Slack
-	ChannelsModel *slack.Channels
-	SettingsModel *settings.Settings
-	MessagesModel *slack.Messages
-	UsersModel    *slack.Users
+	Root            qml.Object
+	Slack           *slack.Model
+	ChannelsModel   *slack.Channels
+	SettingsModel   *settings.Settings
+	MessagesModel   *slack.Messages
+	UsersModel      *slack.Users
+	ImChannelsModel *slack.IMs
 }
 
 func main() {
@@ -33,19 +36,15 @@ func main() {
 }
 
 func run() error {
-	cs := &slack.Channels{}
 	ss := &settings.Settings{}
-	ms := &slack.Messages{}
-	s := &slack.Slack{}
-	us := &slack.Users{}
-	s.Init(ms, us)
 
 	slackfish := SlackfishControl{
-		Slack:         s,
-		ChannelsModel: cs,
-		SettingsModel: ss,
-		MessagesModel: ms,
-		UsersModel:    us,
+		Slack:           &slack.Slack,
+		ChannelsModel:   &slack.Slack.Channels,
+		SettingsModel:   ss,
+		MessagesModel:   &slack.Slack.Messages,
+		UsersModel:      &slack.Slack.Users,
+		ImChannelsModel: &slack.Slack.IMs,
 	}
 
 	engine := qml.SailfishNewEngine()
@@ -89,7 +88,7 @@ func getPath() (string, error) {
 	if len(path) == 0 {
 		path = os.Getenv("HOME")
 		if len(path) == 0 {
-			return "", errors.New("No XDG_DATA or HOME env set!")
+			return "", errors.New("No XDG_DATA or HOME env set")
 		}
 	}
 	return path, nil
