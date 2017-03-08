@@ -49,23 +49,24 @@ func (ims *IMs) Open(userID string) {
 	channelID = chID
 }
 
-func (cs *IMs) GetIMs() {
-	channels, err := API.GetIMChannels()
+// GetIMs returns all IM-channels
+func (ims *IMs) GetIMs() {
+	imChannels, err := API.GetIMChannels()
 	if err != nil {
 		errorLn(err.Error())
 		return
 	}
 
-	for _, channel := range channels {
+	for _, channel := range imChannels {
 		infoLn(channel)
 		c := IM{}
 		c.transformFromBackend(&channel)
 
-		cs.list = append(cs.list, c)
+		ims.list = append(ims.list, c)
 	}
-	cs.Len = len(cs.list)
+	ims.Len = len(ims.list)
 
-	qml.Changed(cs, &cs.Len)
+	qml.Changed(ims, &ims.Len)
 }
 
 // Close closes the currently open channel
