@@ -9,12 +9,14 @@ import (
 // API exports API of slack package
 var API *slackApi.Client
 var slackRtm *slackApi.RTM
+
+// Slack exports all initialized models
 var Slack = Model{}
 
 var messageID = 0
 var token string
 
-// SlackModel represents the entity models for storing information by @API
+// Model represents the entity models for storing information by @API
 type Model struct {
 	Messages Messages
 	Users    Users
@@ -23,7 +25,7 @@ type Model struct {
 }
 
 // Connect establishes a connection to slack API
-func (s *Model) Connect(tkn string) {
+func (m *Model) Connect(tkn string) {
 	token = tkn
 	API = slackApi.New(tkn)
 
@@ -32,24 +34,24 @@ func (s *Model) Connect(tkn string) {
 
 	slackRtm = API.NewRTM()
 	info, _, _ := slackRtm.StartRTM()
-	s.Users.AddUsers(info.Users)
-	s.Channels.AddChannels(info.Channels)
-	s.IMs.AddIMs(info.IMs)
+	m.Users.AddUsers(info.Users)
+	m.Channels.AddChannels(info.Channels)
+	m.IMs.AddIMs(info.IMs)
 
 	go slackRtm.ManageConnection()
 
-	go processEvents(s)
+	go processEvents(m)
 }
 
 // Disconnect from slack API
-func (s *Model) Disconnect() {
+func (m *Model) Disconnect() {
 	err := slackRtm.Disconnect()
 	if err != nil {
 		errorLn(err.Error())
 	}
 }
 
-func processEvents(s *Model) {
+func processEvents(m *Model) {
 	for {
 		select {
 		case msg := <-slackRtm.IncomingEvents:
@@ -64,10 +66,16 @@ func processEvents(s *Model) {
 
 			case *slackApi.MessageEvent:
 				fmt.Printf("Message: %v\n", ev)
-				s.Messages.Add(&ev.Msg)
+				m.Messages.Add(&ev.Msg)
 
 			case *slackApi.PresenceChangeEvent:
 				fmt.Printf("Presence Change: %v\n", ev)
+				kv := make(map[string]interface{})
+				kv["presence"] = ev.Presence
+				ok := m.Users.set(ev.User, kv)
+				if ok != nil {
+					errorLn(ok)
+				}
 
 			case *slackApi.LatencyReport:
 				fmt.Printf("Current latency: %v\n", ev.Value)
@@ -81,7 +89,7 @@ func processEvents(s *Model) {
 
 			case *slackApi.AckMessage:
 				fmt.Printf("AckMessage: %+v\n", ev)
-				s.Messages.MarkSent(ev.ReplyTo)
+				m.Messages.MarkSent(ev.ReplyTo)
 
 			default:
 

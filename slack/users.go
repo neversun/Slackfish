@@ -2,16 +2,17 @@ package slack
 
 import (
 	"encoding/json"
-
-	qml "gopkg.in/qml.v1"
-
+	"errors"
 	slackApi "github.com/nlopes/slack"
+	qml "gopkg.in/qml.v1"
+	"reflect"
 )
 
 // Users holding collection of all users
 type Users struct {
-	users []User
-	Len   int
+	users        []User
+	Len          int
+	LatestChange int // If sth changed in users, but not the lenght, we need a way to inform qml bindings
 }
 
 // User is a Slack user accounts
@@ -33,7 +34,7 @@ type User struct {
 	IsUltraRestricted bool        `json:"isUltraRestricted"`
 	Has2FA            bool        `json:"has2FA"`
 	HasFiles          bool        `json:"hasFiles"`
-	Presence          string      `json:"presence"`
+	Active            bool        `json:"active"`
 }
 
 // UserProfile holds the personal information of a @User
@@ -96,7 +97,7 @@ func (u *User) transformFromBackend(user *slackApi.User) {
 	u.IsUltraRestricted = user.IsUltraRestricted
 	u.Has2FA = user.Has2FA
 	u.HasFiles = user.HasFiles
-	u.Presence = user.Presence
+	u.Active = presenceToActive(user.Presence)
 }
 
 func (us *Users) getUsers(ID string) (users map[string]User) {
@@ -140,4 +141,46 @@ func (us *Users) AddUsers(users []slackApi.User) {
 
 	us.Len = len(us.users)
 	qml.Changed(us, &us.Len)
+}
+
+func (us *Users) find(id string) (i int, err error) {
+	if id == "" {
+		return i, errors.New("id cannot be empty")
+	}
+
+	for index, user := range us.users {
+		if user.ID == id {
+			return index, nil
+		}
+	}
+	return i, errors.New("id not found")
+}
+
+func presenceToActive(presence string) bool {
+	return presence == "active"
+}
+
+func (us *Users) set(id string, values map[string]interface{}) error {
+	i, ok := us.find(id)
+	if ok != nil {
+		return ok
+	}
+
+	userModelValue := reflect.ValueOf(&us.users[i])
+	for key, value := range values {
+		if key == "presence" {
+			key = "Active"
+			value = presenceToActive(value.(string))
+		}
+		infoLn(userModelValue, key, value)
+		Set(userModelValue, key, value)
+		us.users[i] = *userModelValue.Interface().(*User)
+	}
+	us.incrementLatest()
+	return nil
+}
+
+func (us *Users) incrementLatest() {
+	us.LatestChange++
+	qml.Changed(us, &us.LatestChange)
 }

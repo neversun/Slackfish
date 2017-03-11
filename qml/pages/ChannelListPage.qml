@@ -7,6 +7,12 @@ Page {
   id: channelListPage
   allowedOrientations: Orientation.All
 
+  property variant users: UsersLogic.get()
+  property int usersLatestChange: usersModel.latestChange
+  onUsersLatestChangeChanged: {
+    users = UsersLogic.get()
+  }
+
   // view
 
   SilicaFlickable {
@@ -65,13 +71,20 @@ Page {
         itemHeight: Theme.itemSizeSmall
 
         delegate: ListItem {
-          property variant user: UsersLogic.get(imChannelsModel.get(index).user)
+          property variant user: channelListPage.users[imChannelsModel.get(index).user]
           onClicked: {
             imChannelsModel.open(user.id)
             pageStack.push(Qt.resolvedUrl("ChannelPage.qml"), { channelIndex: index, type: 'im'})
           }
 
+          Image {
+            x: Theme.horizontalPageMargin
+            anchors.verticalCenter: parent.verticalCenter
+            source: 'image://theme/icon-s-chat?' + (user.active ? '#7fff00' : '#A9A9A9')
+          }
+
           Label {
+            anchors.verticalCenter: parent.verticalCenter
             text: {
               return user.realName || user.name
             }
