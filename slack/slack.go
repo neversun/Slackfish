@@ -90,6 +90,11 @@ func processEvents(m *Model) {
 			case *slackApi.AckMessage:
 				fmt.Printf("AckMessage: %+v\n", ev)
 				m.Messages.MarkSent(ev.ReplyTo)
+				break
+
+			case *slackApi.UserTypingEvent:
+				fmt.Printf("UserTypingEvent: %+v\n", ev)
+				break
 
 			default:
 

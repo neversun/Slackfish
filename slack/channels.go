@@ -52,7 +52,6 @@ func (t *Topic) transformFromBackend(topic slackApi.Topic) {
 }
 
 func (c *Channel) transformFromBackend(channel *slackApi.Channel) {
-	infoLn("#########################", channel)
 	t := Topic{}
 	t.transformFromBackend(channel.Topic)
 	p := Purpose{}
