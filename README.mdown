@@ -7,6 +7,8 @@ Slack client on Jolla Sailfish OS
 
 ### Project status
 
+**STATUS UPDATE: Development stopped since I am not using SailfishOS anymore (for now).**
+
 _ | date
 :------------- | :-------------
 alpha | see [milestone alpha](https://github.com/neversun/Slackfish/milestone/1)
